@@ -1,8 +1,11 @@
 # FARE Save Drupal Module
-This module is intended to be used together with FARE (set as dependency).
+This module makes it possible to save the search in the private area for later
+usage or sharing.
+This module is intended to be used together with
+[FARE](https://github.com/Open-Education-Polito/oep-fare) (set as dependency).
+
 
 ## How To
-
 1. Clone or download a release of the module.
 2. Enable it inside the Drupal admin page.
 3. After installing, run `drush updatedb`. 
@@ -14,5 +17,5 @@ This module is intended to be used together with FARE (set as dependency).
 This module has a GNU Affero General Public License v3.0.
 
 ## Author
-libremente  
+libremente (C) 2014-2018
 `<surf> AT <libremente> DOT <eu>`
