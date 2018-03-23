@@ -1,0 +1,125 @@
+<?php
+
+/**
+ * @file
+ * FARE salva module.
+ */
+
+/**
+ * Function to set permissions.
+ */
+function fare_salva_permission() {
+  $perms = array(
+    'administer fare_salva' => array(
+      'title' => 'Amministra fare Salva',
+      'description' => 'Assumi il controllo totale sul modulo',
+    ),
+    'access fare_salva' => array(
+      'title' => 'Accesso alle componenti del modulo',
+      'description' => 'Accesso a tutte le funzionalità del modulo -> Deve essere solo per utenti registrati!',
+    ),
+  );
+  return $perms;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function fare_salva_views_api() {
+  return array(
+    'api' => 3.0,
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function fare_salva_menu() {
+  $items = array();
+
+  // Page to share the search link.
+  // Page function, not a "drupal_get_form", so no args.
+  $items['fare/share'] = array(
+    'title' => 'Condividi la tua ricerca',
+    'page callback' => '_share_page',
+    'access callback' => 'user_access',
+    'access arguments' => array('access fare_salva'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Callback function.
+ */
+function _share_page($page = NULL) {
+  global $user;
+
+  // Get id della pagina con urldecode di $page che contiene la URL intera.
+  // Get page ID with urldecode of $page.
+  if ($page != NULL) {
+    $id_pagina = urldecode($page);
+  }
+  else {
+    // Go back home.
+    drupal_goto("");
+  }
+
+  /* Arriving here if:
+   * 0) user intentionally clicked.
+   * 1) User made a mistake.
+   * 2) Someone else wants to see my searches.
+   * 3) Someone tries to randomly access some contents.
+   */
+
+  // Check "shared" flag.
+  // In "query" I have the flag I am interested in.
+  // Check if user has permission on the page.
+  $node = node_load($id_pagina);
+
+  if ($node == NULL) {
+    drupal_set_message(t("Il contenuto selezionato non è al momento fruibile. Ci scusiamo per l'inconveniente"), "error");
+    drupal_goto("");
+  }
+
+  if (strcmp($node->type, 'ricerche_salvate') == 0) {
+    if (isset($user->name)) {
+      if (strcmp($node->name, $user->name) == 0) {
+        // OK, user is author.
+        // Set "shared" variable.
+        $shared = $node->field_condiviso['und'][0]['value'];
+        $link = url('fare/elabora/' . $id_pagina);
+
+        if ($shared !== 1) {
+          // Set shared. From now on it will be shared.
+          $node->field_condiviso['und'][0]['value'] = 1;
+          node_save($node);
+        }
+      }
+    }
+    else {
+      // Access not permitted.
+      drupal_set_message(t("Il contenuto selezionato non è al momento fruibile. Ci scusiamo per l'inconveniente"), "error");
+      drupal_goto("");
+    }
+  }
+  else {
+    // Access not permitted.
+    drupal_set_message(t("Il contenuto selezionato non è al momento fruibile. Ci scusiamo per l'inconveniente"), "error");
+    drupal_goto("");
+  }
+
+  // Preparing the form.
+  $fare_share = array(
+    '#type' => 'fieldset',
+    '#title' => t('Link condiviso'),
+    '#description' => 'Con questo link chiunque potrà accedere alla ricerca effettuata:  ' . l(t('Link da condividere'), $link),
+    '#collapsible' => FALSE,
+    '#collapsed' => FALSE,
+  );
+
+  // Rendering the form.
+  $ret = drupal_render($fare_share);
+  return $ret;
+}

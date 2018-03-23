@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * FARE salva module.
+ */
+
+/**
+ * Function to *delete* the view installed.
+ *
+ * Called when the module is uninstalled.
+ */
+function fare_salva_update_7001() {
+  // Name of custom view.
+  $name = 'view_ricerche';
+
+  // Get of defaults views.
+  $status = variable_get('views_defaults', array());
+
+  // Set my view as TRUE.
+  $status[$name] = TRUE;
+
+  variable_set('views_defaults', $status);
+}

@@ -1,0 +1,11 @@
+name = FARE Salva
+description = Modulo per il salvataggio delle ricerche
+
+package = FARE
+core = "7.x"
+project = "fare"
+version = 0.1.0
+
+dependencies[] = fare
+dependencies[] = views
+
