@@ -73,8 +73,9 @@ function fare_salva_menu() {
  */
 function _share_page($page = NULL) {
   global $user;
+  // Register message.
+  $notify_message = t("Il contenuto selezionato non è al momento fruibile. Ci scusiamo per l'inconveniente");
 
-  // Get id della pagina con urldecode di $page che contiene la URL intera.
   // Get page ID with urldecode of $page.
   if ($page != NULL) {
     $id_pagina = urldecode($page);
@@ -97,7 +98,7 @@ function _share_page($page = NULL) {
   $node = node_load($id_pagina);
 
   if ($node == NULL) {
-    drupal_set_message(t("Il contenuto selezionato non è al momento fruibile. Ci scusiamo per l'inconveniente"), "error");
+    fare_notice_handler($notify_message, TRUE);
     drupal_goto("");
   }
 
@@ -113,18 +114,19 @@ function _share_page($page = NULL) {
           // Set shared. From now on it will be shared.
           $node->field_condiviso['und'][0]['value'] = 1;
           node_save($node);
+          fare_notice_handler(t("Nuovo contenuto condiviso: ") . $node->name, FALSE);
         }
       }
     }
     else {
       // Access not permitted.
-      drupal_set_message(t("Il contenuto selezionato non è al momento fruibile. Ci scusiamo per l'inconveniente"), "error");
+      fare_notice_handler($notify_message, TRUE);
       drupal_goto("");
     }
   }
   else {
     // Access not permitted.
-    drupal_set_message(t("Il contenuto selezionato non è al momento fruibile. Ci scusiamo per l'inconveniente"), "error");
+    fare_notice_handler($notify_message, TRUE);
     drupal_goto("");
   }
 
@@ -132,7 +134,7 @@ function _share_page($page = NULL) {
   $fare_share = array(
     '#type' => 'fieldset',
     '#title' => t('Link condiviso'),
-    '#description' => 'Con questo link chiunque potrà accedere alla ricerca effettuata:  ' . l(t('Link da condividere'), $link),
+    '#description' => t('Con questo link chiunque potrà accedere alla ricerca effettuata: ') . l(t('Link da condividere'), $link),
     '#collapsible' => FALSE,
     '#collapsed' => FALSE,
   );
